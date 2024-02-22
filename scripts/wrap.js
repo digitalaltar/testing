@@ -219,38 +219,36 @@ controller2.addEventListener('disconnected', () => {
     textMaterial.map.needsUpdate = true;
 });
 
+let resetColorTimeout;
+
 function animate() {
-    // Removed requestAnimationFrame(animate); We'll use renderer.setAnimationLoop instead.
-    
     if (customMaterial && customMaterial.uniforms.time) {
-        customMaterial.uniforms.time.value += 0.05; // Ensure this runs only after texture is loaded
+        customMaterial.uniforms.time.value += 0.05;
     }
     
     if (currentSession) {
         currentSession.inputSources.forEach((inputSource) => {
             if (inputSource.gamepad && (inputSource.handedness === 'left' || inputSource.handedness === 'right')) {
                 const axes = inputSource.gamepad.axes;
-                // Adjust based on your controller's axis mapping, typically 0 and 1 for the main thumbstick
                 const horizontal = axes[0];
                 const vertical = axes[1];
 
-                // Adjust debugObject material color based on thumbstick direction
+                clearTimeout(resetColorTimeout); // Clear any previous timeout to reset color
+
                 if (horizontal < -0.5) debugObject.material.color.set('orange');
                 else if (horizontal > 0.5) debugObject.material.color.set('red');
-
-                if (vertical < -0.5) debugObject.material.color.set('blue');
+                else if (vertical < -0.5) debugObject.material.color.set('blue');
                 else if (vertical > 0.5) debugObject.material.color.set('skyblue');
-
-                // Reset to neutral color if thumbstick is near the center
-                if (Math.abs(horizontal) <= 0.5 && Math.abs(vertical) <= 0.5) {
-                    debugObject.material.color.set('white'); // Neutral color
-                }
+                
+                // Set a timeout to reset the color after a delay
+                resetColorTimeout = setTimeout(() => {
+                    debugObject.material.color.set('white');
+                }, 500); // Delay in milliseconds
             }
         });
     }
-
-  renderer.render(scene, camera);
-  requestAnimationFrame(animate);
+    
+    renderer.render(scene, camera);
 }
 
 // Use this to handle the animation loop in VR mode
