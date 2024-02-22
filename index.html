@@ -3,22 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Basic VR Scene with Controllers</title>
+    <title>Basic VR Scene with Movement</title>
     <style>
         body { margin: 0; }
         canvas { display: block; }
     </style>
 </head>
 <body>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/js/loaders/GLTFLoader.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/js/XRController.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/js/XREstimatedLighting.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/js/vr/WebXR.js"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "./scripts/three.module.min.js",
+            "VRButton": "./scripts/VRButton.js"
+        }
+    }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { VRButton } from 'VRButton';
 
-    <script>
         let camera, scene, renderer;
-        let vrButton, controller;
+        let controller;
+        let moveDirection = 0;
 
         init();
         animate();
@@ -29,30 +35,40 @@
 
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.xr.enabled = true;
             document.body.appendChild(renderer.domElement);
 
-            vrButton = document.createElement('button');
-            vrButton.innerHTML = 'Enter VR';
-            vrButton.style.position = 'absolute';
-            vrButton.style.top = '10px';
-            vrButton.style.left = '10px';
-            document.body.appendChild(vrButton);
+            // Check if WebXR is supported
+            if ('xr' in navigator) {
+                // Create a button to enter VR mode
+                const vrButton = document.createElement('button');
+                vrButton.innerHTML = 'Enter VR';
+                vrButton.style.position = 'absolute';
+                vrButton.style.top = '10px';
+                vrButton.style.left = '10px';
+                document.body.appendChild(vrButton);
 
-            vrButton.addEventListener('click', () => {
-                if (renderer.xr.isPresenting) {
-                    renderer.xr.exitXR();
-                } else {
-                    renderer.xr.requestSession('immersive-vr').then((session) => {
-                        session.addEventListener('end', () => {
-                            vrButton.innerText = 'Enter VR';
+                vrButton.addEventListener('click', () => {
+                    if (!renderer.xr.isPresenting) {
+                        // Request XR session
+                        navigator.xr.requestSession('immersive-vr').then((session) => {
+                            // Set up the renderer for XR
+                            renderer.xr.setSession(session);
+                            session.addEventListener('end', () => {
+                                vrButton.innerText = 'Enter VR';
+                            });
+                            vrButton.innerText = 'Exit VR';
                         });
-                        vrButton.innerText = 'Exit VR';
-                        renderer.xr.setReferenceSpaceType('local');
-                        renderer.xr.setSession(session);
-                    });
-                }
-            });
+                    } else {
+                        // Exit XR session
+                        renderer.xr.getSession().end();
+                    }
+                });
+            } else {
+                // Display a message if WebXR is not supported
+                const message = document.createElement('div');
+                message.textContent = 'WebXR not supported';
+                document.body.appendChild(message);
+            }
 
             const geometry = new THREE.BoxGeometry();
             const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
@@ -60,12 +76,6 @@
             scene.add(cube);
 
             camera.position.z = 5;
-
-            // Set up controllers
-            controller = new THREE.XRController(renderer.xr);
-            controller.addEventListener('selectstart', onSelectStart);
-            controller.addEventListener('selectend', onSelectEnd);
-            scene.add(controller);
 
             window.addEventListener('resize', onWindowResize);
         }
@@ -75,6 +85,20 @@
         }
 
         function render() {
+            // Update move direction based on controller input
+            if (controller && controller.inputSource && controller.inputSource.gamepad) {
+                const gamepad = controller.inputSource.gamepad;
+                const xAxis = gamepad.axes[0];
+                moveDirection = xAxis;
+            }
+
+            // Move cube left or right based on move direction
+            scene.children.forEach(object => {
+                if (object.isMesh) {
+                    object.position.x += moveDirection * 0.05;
+                }
+            });
+
             renderer.render(scene, camera);
         }
 
@@ -82,16 +106,6 @@
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-
-        function onSelectStart() {
-            // Handle select/start button press event
-            console.log('Select/start button pressed.');
-        }
-
-        function onSelectEnd() {
-            // Handle select/end button release event
-            console.log('Select/end button released.');
         }
     </script>
 </body>
