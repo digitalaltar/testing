@@ -230,8 +230,9 @@ function animate() {
         currentSession.inputSources.forEach((inputSource) => {
             if (inputSource) {
                 debugObject.material.color.set('aquamarine');
-            } else {
-                debugObject.material.color.set('red');
+            }
+            if (inputSource.gamepad) {
+                debugObject.material.color.set('orange');
             }
         });
     }
