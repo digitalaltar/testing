@@ -105,7 +105,7 @@ fetch('./data.json')
 
 // Create a geometry, material, and then mesh for the debug object
 const debugGeometry = new THREE.BoxGeometry(1, 1, 1); // Create a small cube
-const debugMaterial = new THREE.MeshBasicMaterial({ color: 'blue' }); // Initial color
+const debugMaterial = new THREE.MeshBasicMaterial({ color: 'pink' }); // Initial color
 const debugObject = new THREE.Mesh(debugGeometry, debugMaterial);
 
 // Position it in front of the camera or any specific place
@@ -223,33 +223,27 @@ let resetColorTimeout;
 
 function animate() {
     if (customMaterial && customMaterial.uniforms.time) {
-        customMaterial.uniforms.time.value += 0.05; // Ensure this runs only after texture is loaded
+        customMaterial.uniforms.time.value += 0.05;
     }
     
+    let joystickMoved = false;
+
     if (currentSession) {
         currentSession.inputSources.forEach((inputSource) => {
             if (inputSource && inputSource.gamepad) {
                 const axes = inputSource.gamepad.axes;
-                // Assuming axes[0] is horizontal and axes[1] is vertical
-                const horizontal = axes[0];
-                const vertical = axes[1];
-
-                // Adjusting thresholds for detection sensitivity
-                if (horizontal < -0.5) {
-                    debugObject.material.color.set('orange'); // Left
-                } else if (horizontal > 0.5) {
-                    debugObject.material.color.set('red'); // Right
-                } else if (vertical < -0.5) {
-                    debugObject.material.color.set('blue'); // Up
-                } else if (vertical > 0.5) {
-                    debugObject.material.color.set('green'); // Down
-                } else {
-                    debugObject.material.color.set('aquamarine'); // Neutral
+                
+                // Simplify the condition to see if any movement is detected
+                if (Math.abs(axes[0]) > 0.1 || Math.abs(axes[1]) > 0.1) {
+                    debugObject.material.color.set('red'); // Movement detected
+                    joystickMoved = true;
                 }
-            } else {
-                debugObject.material.color.set('yellow'); // No gamepad detected
             }
         });
+    }
+
+    if (!joystickMoved) {
+        debugObject.material.color.set('yellow'); // No movement detected
     }
 
     renderer.render(scene, camera);
