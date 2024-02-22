@@ -87,13 +87,17 @@
             console.log("VR session started.");
             // Change cube color to blue when entering VR
             cube.material.color.set('blue'); // Blue color
+            // Adjust cube position for VR
+            cube.position.set(0, 1.6, -3); // Position the cube at eye level
         }
 
         function onSessionEnd() {
             // Function to handle VR session end
             console.log("VR session ended.");
             // Change cube color back to purple when exiting VR
-            cube.material.color.set('orange'); // Purple color
+            cube.material.color.set('purple'); // Purple color
+            // Reset cube position
+            cube.position.set(0, 0, 0); // Reset cube position to origin
         }
     </script>
 </body>
