@@ -229,6 +229,8 @@ function animate() {
     if (currentSession) {
         currentSession.inputSources.forEach((inputSource) => {
             if (inputSource.gamepad && (inputSource.handedness === 'left' || inputSource.handedness === 'right')) {
+                debugObject.material.color.set('aquamarine');
+
                 const axes = inputSource.gamepad.axes;
                 const horizontal = axes[0];
                 const vertical = axes[1];
@@ -239,6 +241,8 @@ function animate() {
                 else if (horizontal > 0.5) debugObject.material.color.set('red');
                 else if (vertical < -0.5) debugObject.material.color.set('blue');
                 else if (vertical > 0.5) debugObject.material.color.set('skyblue');
+
+                if (axes) debugObject.material.color.set('violet');
                 
                 // Set a timeout to reset the color after a delay
                 resetColorTimeout = setTimeout(() => {
@@ -247,7 +251,7 @@ function animate() {
             }
         });
     }
-    
+
     renderer.render(scene, camera);
 }
 
