@@ -223,15 +223,31 @@ let resetColorTimeout;
 
 function animate() {
     if (customMaterial && customMaterial.uniforms.time) {
-        customMaterial.uniforms.time.value += 0.05;
+        customMaterial.uniforms.time.value += 0.05; // Ensure this runs only after texture is loaded
     }
     
     if (currentSession) {
         currentSession.inputSources.forEach((inputSource) => {
             if (inputSource && inputSource.gamepad) {
-                debugObject.material.color.set('aquamarine');
+                const axes = inputSource.gamepad.axes;
+                // Assuming axes[0] is horizontal and axes[1] is vertical
+                const horizontal = axes[0];
+                const vertical = axes[1];
+
+                // Adjusting thresholds for detection sensitivity
+                if (horizontal < -0.5) {
+                    debugObject.material.color.set('orange'); // Left
+                } else if (horizontal > 0.5) {
+                    debugObject.material.color.set('red'); // Right
+                } else if (vertical < -0.5) {
+                    debugObject.material.color.set('blue'); // Up
+                } else if (vertical > 0.5) {
+                    debugObject.material.color.set('green'); // Down
+                } else {
+                    debugObject.material.color.set('aquamarine'); // Neutral
+                }
             } else {
-                debugObject.material.color.set('yellow');
+                debugObject.material.color.set('yellow'); // No gamepad detected
             }
         });
     }
