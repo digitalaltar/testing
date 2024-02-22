@@ -231,6 +231,26 @@ function handleControllerInput(controller) {
     }
 }
 
+function updateControllerInput(controller) {
+  if (!controller.gamepad) return; // Ensure the gamepad object is available
+
+  const axes = controller.gamepad.axes;
+  const horizontal = axes[0];
+  const vertical = axes[1];
+
+  // Debugging the direction with color changes
+  if (horizontal < -0.5) debugObject.material.color.set('orange');
+  else if (horizontal > 0.5) debugObject.material.color.set('red');
+
+  if (vertical < -0.5) debugObject.material.color.set('blue');
+  else if (vertical > 0.5) debugObject.material.color.set('skyblue');
+
+  // Reset color if joystick is near neutral position
+  if (Math.abs(horizontal) <= 0.5 && Math.abs(vertical) <= 0.5) {
+    debugObject.material.color.set('white'); // Assuming white as the neutral color
+  }
+}
+
 controller1.addEventListener('connected', (event) => {
     textMaterial.map = createTextTexture(`Controller 1 connected with hand ${event.data.handedness}`);
     textMaterial.map.needsUpdate = true;
@@ -262,8 +282,8 @@ function animate() {
     }
     
     if (renderer.xr.isPresenting) {
-        handleControllerInput(controller1); // For each controller
-        handleControllerInput(controller2);
+      updateControllerInput(controller1);
+      updateControllerInput(controller2);
     } else {
         // VR mode is not active, update OrbitControls
         controls.update();
