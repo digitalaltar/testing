@@ -23,7 +23,6 @@
         import { VRButton } from 'VRButton';
 
         let camera, scene, renderer;
-        let moveDirection = 0;
         let cube;
 
         init();
@@ -57,18 +56,17 @@
                 console.log("WebXR is not supported.");
             }
             
+            // Create cube
             const geometry = new THREE.BoxGeometry();
-            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+            const material = new THREE.MeshBasicMaterial({ color: 0x800080 }); // Purple color
             cube = new THREE.Mesh(geometry, material);
             scene.add(cube);
 
             // Adjust cube position to be closer to the camera
             cube.position.z = -5;
 
-            // Adjust camera position to face the cube
-            camera.position.z = 0;
-            camera.position.y = 1.5;
-            camera.lookAt(0, 1.5, -5);
+            // Adjust camera position
+            camera.position.z = 5;
 
             window.addEventListener('resize', onWindowResize);
         }
@@ -91,24 +89,14 @@
             // Function to handle VR session start
             console.log("VR session started.");
             // Change cube color to blue when entering VR
-            cube.material.color.set(0x0000ff);
-            // Print message to environment
-            printToEnvironment("VR session started.");
+            cube.material.color.set(0x0000ff); // Blue color
         }
 
         function onSessionEnd() {
             // Function to handle VR session end
             console.log("VR session ended.");
-            // Change cube color back to green when exiting VR
-            cube.material.color.set(0x00ff00);
-            // Print message to environment
-            printToEnvironment("VR session ended.");
-        }
-
-        function printToEnvironment(message) {
-            const p = document.createElement('p');
-            p.textContent = message;
-            document.body.appendChild(p);
+            // Change cube color back to purple when exiting VR
+            cube.material.color.set(0x800080); // Purple color
         }
     </script>
 </body>
