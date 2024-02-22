@@ -29,6 +29,8 @@ let customMaterial = new THREE.ShaderMaterial({
     side: THREE.BackSide
 });
 
+let currentSession = null; // Define this in a higher scope
+
 // Setup the scene, camera, and renderer
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
@@ -114,12 +116,15 @@ scene.add(debugObject);
 
 // Event listeners for entering and exiting VR
 renderer.xr.addEventListener('sessionstart', () => {
+    currentSession = renderer.xr.getSession();
     // Save the camera state when entering VR
     savedCameraState.position.copy(camera.position);
     savedCameraState.quaternion.copy(camera.quaternion);
 });
 
 renderer.xr.addEventListener('sessionend', () => {
+    currentSession = null;
+
     // Restore the camera state when exiting VR
     camera.position.copy(savedCameraState.position);
     camera.quaternion.copy(savedCameraState.quaternion);
@@ -191,13 +196,6 @@ const controllerGrip2 = renderer.xr.getControllerGrip(1);
 controllerGrip2.add(controllerModelFactory.createControllerModel(controllerGrip2));
 scene.add(controllerGrip2);
 
-// Event listener for controller input
-function handleControllerInput(controller) {
-    debugObject.material.color.set('yellow');
-
-    if (!controller) return;
-}
-
 controller1.addEventListener('connected', (event) => {
     textMaterial.map = createTextTexture(`Controller 1 connected with hand ${event.data.handedness}`);
     textMaterial.map.needsUpdate = true;
@@ -228,25 +226,28 @@ function animate() {
         customMaterial.uniforms.time.value += 0.05; // Ensure this runs only after texture is loaded
     }
     
-  session.inputSources.forEach((inputSource) => {
-    if (inputSource.gamepad && inputSource.handedness === 'left' || inputSource.handedness === 'right') {
-      const axes = inputSource.gamepad.axes;
-      const horizontal = axes[2]; // Adjust based on your controller's axis mapping
-      const vertical = axes[3];
+    if (currentSession) {
+        currentSession.inputSources.forEach((inputSource) => {
+            if (inputSource.gamepad && (inputSource.handedness === 'left' || inputSource.handedness === 'right')) {
+                const axes = inputSource.gamepad.axes;
+                // Adjust based on your controller's axis mapping, typically 0 and 1 for the main thumbstick
+                const horizontal = axes[0];
+                const vertical = axes[1];
 
-      // Adjust debugObject material color based on thumbstick direction
-      if (horizontal < -0.5) debugObject.material.color.set('orange');
-      else if (horizontal > 0.5) debugObject.material.color.set('red');
+                // Adjust debugObject material color based on thumbstick direction
+                if (horizontal < -0.5) debugObject.material.color.set('orange');
+                else if (horizontal > 0.5) debugObject.material.color.set('red');
 
-      if (vertical < -0.5) debugObject.material.color.set('blue');
-      else if (vertical > 0.5) debugObject.material.color.set('skyblue');
+                if (vertical < -0.5) debugObject.material.color.set('blue');
+                else if (vertical > 0.5) debugObject.material.color.set('skyblue');
 
-      // Reset to neutral color if thumbstick is near the center
-      if (Math.abs(horizontal) <= 0.5 && Math.abs(vertical) <= 0.5) {
-        debugObject.material.color.set('white'); // Neutral color
-      }
+                // Reset to neutral color if thumbstick is near the center
+                if (Math.abs(horizontal) <= 0.5 && Math.abs(vertical) <= 0.5) {
+                    debugObject.material.color.set('white'); // Neutral color
+                }
+            }
+        });
     }
-  });
 
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
