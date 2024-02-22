@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic VR Scene with Controllers</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/js/loaders/GLTFLoader.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/js/XRController.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/js/XREstimatedLighting.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/js/vr/WebXR.js"></script>
+
+    <script>
+        let camera, scene, renderer;
+        let vrButton, controller;
+
+        init();
+        animate();
+
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.xr.enabled = true;
+            document.body.appendChild(renderer.domElement);
+
+            vrButton = document.createElement('button');
+            vrButton.innerHTML = 'Enter VR';
+            vrButton.style.position = 'absolute';
+            vrButton.style.top = '10px';
+            vrButton.style.left = '10px';
+            document.body.appendChild(vrButton);
+
+            vrButton.addEventListener('click', () => {
+                if (renderer.xr.isPresenting) {
+                    renderer.xr.exitXR();
+                } else {
+                    renderer.xr.requestSession('immersive-vr').then((session) => {
+                        session.addEventListener('end', () => {
+                            vrButton.innerText = 'Enter VR';
+                        });
+                        vrButton.innerText = 'Exit VR';
+                        renderer.xr.setReferenceSpaceType('local');
+                        renderer.xr.setSession(session);
+                    });
+                }
+            });
+
+            const geometry = new THREE.BoxGeometry();
+            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+            const cube = new THREE.Mesh(geometry, material);
+            scene.add(cube);
+
+            camera.position.z = 5;
+
+            // Set up controllers
+            controller = new THREE.XRController(renderer.xr);
+            controller.addEventListener('selectstart', onSelectStart);
+            controller.addEventListener('selectend', onSelectEnd);
+            scene.add(controller);
+
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        function animate() {
+            renderer.setAnimationLoop(render);
+        }
+
+        function render() {
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function onSelectStart() {
+            // Handle select/start button press event
+            console.log('Select/start button pressed.');
+        }
+
+        function onSelectEnd() {
+            // Handle select/end button release event
+            console.log('Select/end button released.');
+        }
+    </script>
+</body>
+</html>
