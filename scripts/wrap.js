@@ -105,7 +105,7 @@ fetch('./data.json')
 
 // Create a geometry, material, and then mesh for the debug object
 const debugGeometry = new THREE.BoxGeometry(1, 1, 1); // Create a small cube
-const debugMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 }); // Initially green
+const debugMaterial = new THREE.MeshBasicMaterial({ color: 'blue' }); // Initial color
 const debugObject = new THREE.Mesh(debugGeometry, debugMaterial);
 
 // Position it in front of the camera or any specific place
@@ -228,11 +228,10 @@ function animate() {
     
     if (currentSession) {
         currentSession.inputSources.forEach((inputSource) => {
-            if (inputSource) {
+            if (inputSource && inputSource.gamepad) {
                 debugObject.material.color.set('aquamarine');
-            }
-            if (inputSource.gamepad) {
-                debugObject.material.color.set('orange');
+            } else {
+                debugObject.material.color.set('yellow');
             }
         });
     }
