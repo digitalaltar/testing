@@ -196,59 +196,6 @@ function handleControllerInput(controller) {
     debugObject.material.color.set('yellow');
 
     if (!controller) return;
-
-    // Get the input source
-    const inputSource = controller.inputSource;
-
-    // Check if the input source is available
-    if (inputSource) {
-        // Log the input source for debugging
-        console.log('Input source:', inputSource);
-        debugObject.material.color.set('orange');
-
-        // Register an event listener for thumbstick input
-        inputSource.addEventListener('thumbstickmoved', (event) => {
-            // Log that the thumbstick event is triggered
-            console.log('Thumbstick moved:', event);
-
-            // Get the thumbstick axes values
-            const axes = event.axes;
-
-            // Log the thumbstick axes values for debugging
-            console.log('Thumbstick axes:', axes);
-
-            // Define sensitivity for panning and zooming
-            const panSensitivity = 0.1;
-            const zoomSensitivity = 0.1;
-
-            // Update object's position based on thumbstick input
-            debugObject.position.x += axes.x * panSensitivity; // Left/Right panning
-            debugObject.position.y += axes.y * zoomSensitivity; // Up/Down zooming
-
-            // Set cube color to purple
-            debugObject.material.color.set('purple');
-        });
-    }
-}
-
-function updateControllerInput(controller) {
-  if (!controller.gamepad) return; // Ensure the gamepad object is available
-
-  const axes = controller.gamepad.axes;
-  const horizontal = axes[0];
-  const vertical = axes[1];
-
-  // Debugging the direction with color changes
-  if (horizontal < -0.5) debugObject.material.color.set('orange');
-  else if (horizontal > 0.5) debugObject.material.color.set('red');
-
-  if (vertical < -0.5) debugObject.material.color.set('blue');
-  else if (vertical > 0.5) debugObject.material.color.set('skyblue');
-
-  // Reset color if joystick is near neutral position
-  if (Math.abs(horizontal) <= 0.5 && Math.abs(vertical) <= 0.5) {
-    debugObject.material.color.set('white'); // Assuming white as the neutral color
-  }
 }
 
 controller1.addEventListener('connected', (event) => {
@@ -281,15 +228,28 @@ function animate() {
         customMaterial.uniforms.time.value += 0.05; // Ensure this runs only after texture is loaded
     }
     
-    if (renderer.xr.isPresenting) {
-      updateControllerInput(controller1);
-      updateControllerInput(controller2);
-    } else {
-        // VR mode is not active, update OrbitControls
-        controls.update();
-    }
+  session.inputSources.forEach((inputSource) => {
+    if (inputSource.gamepad && inputSource.handedness === 'left' || inputSource.handedness === 'right') {
+      const axes = inputSource.gamepad.axes;
+      const horizontal = axes[2]; // Adjust based on your controller's axis mapping
+      const vertical = axes[3];
 
-    renderer.render(scene, camera);
+      // Adjust debugObject material color based on thumbstick direction
+      if (horizontal < -0.5) debugObject.material.color.set('orange');
+      else if (horizontal > 0.5) debugObject.material.color.set('red');
+
+      if (vertical < -0.5) debugObject.material.color.set('blue');
+      else if (vertical > 0.5) debugObject.material.color.set('skyblue');
+
+      // Reset to neutral color if thumbstick is near the center
+      if (Math.abs(horizontal) <= 0.5 && Math.abs(vertical) <= 0.5) {
+        debugObject.material.color.set('white'); // Neutral color
+      }
+    }
+  });
+
+  renderer.render(scene, camera);
+  requestAnimationFrame(animate);
 }
 
 // Use this to handle the animation loop in VR mode
