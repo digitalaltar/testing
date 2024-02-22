@@ -58,12 +58,9 @@
             
             // Create cube
             const geometry = new THREE.BoxGeometry();
-            const material = new THREE.MeshBasicMaterial({ color: 0x800080 }); // Purple color
+            const material = new THREE.MeshBasicMaterial({ color: 'purple' }); // Purple color
             cube = new THREE.Mesh(geometry, material);
             scene.add(cube);
-
-            // Adjust cube position to be closer to the camera
-            cube.position.z = -5;
 
             // Adjust camera position
             camera.position.z = 5;
@@ -89,14 +86,14 @@
             // Function to handle VR session start
             console.log("VR session started.");
             // Change cube color to blue when entering VR
-            cube.material.color.set(0x0000ff); // Blue color
+            cube.material.color.set('blue'); // Blue color
         }
 
         function onSessionEnd() {
             // Function to handle VR session end
             console.log("VR session ended.");
             // Change cube color back to purple when exiting VR
-            cube.material.color.set(0x800080); // Purple color
+            cube.material.color.set('orange'); // Purple color
         }
     </script>
 </body>
