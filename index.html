@@ -92,6 +92,8 @@
             console.log("VR session started.");
             // Change cube color to blue when entering VR
             cube.material.color.set(0x0000ff);
+            // Print message to environment
+            printToEnvironment("VR session started.");
         }
 
         function onSessionEnd() {
@@ -99,6 +101,14 @@
             console.log("VR session ended.");
             // Change cube color back to green when exiting VR
             cube.material.color.set(0x00ff00);
+            // Print message to environment
+            printToEnvironment("VR session ended.");
+        }
+
+        function printToEnvironment(message) {
+            const p = document.createElement('p');
+            p.textContent = message;
+            document.body.appendChild(p);
         }
     </script>
 </body>
