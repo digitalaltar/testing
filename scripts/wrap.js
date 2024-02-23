@@ -106,7 +106,7 @@ fetch('./data.json')
 
 // Create a geometry, material, and then mesh for the debug object
 const debugGeometry = new THREE.BoxGeometry(1, 1, 1); // Create a small cube
-const debugMaterial = new THREE.MeshBasicMaterial({ color: 'purple' }); // Initial color
+const debugMaterial = new THREE.MeshBasicMaterial({ color: 'orange' }); // Initial color
 const debugObject = new THREE.Mesh(debugGeometry, debugMaterial);
 
 // Position it in front of the camera or any specific place
@@ -236,10 +236,10 @@ function animate() {
                     const horizontal = axes[0]; // Assuming axes[0] is the horizontal axis
 
                     if (cylinder) {
-                        cylinder.rotation.y += horizontal * 0.05;
-                        debugObject.material.color.set('orange'); // Joystick exists
+                        cylinder.rotation.y += 0.05;
+                        debugObject.material.color.set('aquamarine'); // Joystick exists
                     } else {
-                        debugObject.material.color.set('aquamarine'); // Joystick does not exist
+                        debugObject.material.color.set('red'); // Joystick does not exist
                     }
                 }
             }
