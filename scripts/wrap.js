@@ -222,15 +222,23 @@ controller2.addEventListener('disconnected', () => {
 
 function animate() {
     if (customMaterial && customMaterial.uniforms.time) {
-        customMaterial.uniforms.time.value += 0.05; // Increment time for any custom animations
+        customMaterial.uniforms.time.value += 0.05;
     }
-    
+
     let joystickExists = false; // Flag to check joystick existence
 
     if (currentSession) {
         currentSession.inputSources.forEach((inputSource) => {
             if (inputSource && inputSource.gamepad && inputSource.gamepad.axes.length > 0) {
-                joystickExists = true; // Joystick exists if there are axes
+                const axes = inputSource.gamepad.axes;
+                if (axes.length >= 2) {
+                    const horizontal = axes[0]; // Assuming axes[0] is the horizontal axis
+                    // Adjust camera rotation based on joystick input
+                    // The multiplier controls the sensitivity and direction of rotation
+                    camera.rotation.y += horizontal * 0.05;
+
+                    joystickExists = true; // Joystick exists if there are axes
+                }
             }
         });
     }
