@@ -106,7 +106,7 @@ fetch('./data.json')
 
 // Create a geometry, material, and then mesh for the debug object
 const debugGeometry = new THREE.BoxGeometry(1, 1, 1); // Create a small cube
-const debugMaterial = new THREE.MeshBasicMaterial({ color: 'purple' }); // Initial color
+const debugMaterial = new THREE.MeshBasicMaterial({ color: 'limegreen' }); // Initial color
 const debugObject = new THREE.Mesh(debugGeometry, debugMaterial);
 
 // Position it in front of the camera or any specific place
@@ -226,24 +226,26 @@ function animate() {
         customMaterial.uniforms.time.value += 0.05;
     }
 
-    let joystickExists = false; // Flag to check joystick existence
-
     if (currentSession) {
-        currentSession.inputSources.forEach((inputSource) => {
-            if (inputSource && inputSource.gamepad && inputSource.gamepad.axes.length > 0) {
-                const axes = inputSource.gamepad.axes;
-                if (axes.length >= 2) {
-                    const horizontal = axes[1];
+       for (const source of currentSession.inputSources) {
+            if (source && source.handedness) {
+                handedness = source.handedness; //left or right controllers
+            }
+            if (!source.gamepad) continue;
+            const controller = renderer.xr.getController(i++);
+            const old = prevGamePads.get(source);
+            const data = {
+                handedness: handedness,
+                buttons: source.gamepad.buttons.map((b) => b.value),
+                axes: source.gamepad.axes.slice(0)
+            };
 
-                    if (cylinder) {
-                        cylinder.rotation.y += horizontal;
-                        debugObject.material.color.set('orange'); // Joystick exists
-                    } else {
-                        debugObject.material.color.set('green'); // Joystick does not exist
-                    }
+            data.axes.forEach((value, i) => {
+                if (Math.abs(value) > 0.2) {
+                    debugObject.material.color.set('aquamarine'); // Joystick exists   
                 }
             }
-        });
+        }
     }
 
     renderer.render(scene, camera);
