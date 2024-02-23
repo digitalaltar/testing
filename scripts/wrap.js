@@ -233,10 +233,10 @@ function animate() {
             if (inputSource && inputSource.gamepad && inputSource.gamepad.axes.length > 0) {
                 const axes = inputSource.gamepad.axes;
                 if (axes.length >= 2) {
-                    const horizontal = axes[0]; // Assuming axes[0] is the horizontal axis
+                    const horizontal = axes[1];
 
                     if (cylinder) {
-                        cylinder.rotation.y += 0.05;
+                        cylinder.rotation.y += horizontal + 0.05;
                         debugObject.material.color.set('aquamarine'); // Joystick exists
                     } else {
                         debugObject.material.color.set('red'); // Joystick does not exist
