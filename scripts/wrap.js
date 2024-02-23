@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'OrbitControls';
 import { VRButton } from 'VRButton';
-import { XRControllerModelFactory } from 'XRControllerModelFactory';
 import { GLTFLoader } from 'GLTFLoader';
 import { MotionController } from 'MotionController';
 
@@ -104,17 +103,6 @@ fetch('./data.json')
   })
   .catch(error => console.error('Error loading the JSON file:', error));
 
-// Create a geometry, material, and then mesh for the debug object
-const debugGeometry = new THREE.BoxGeometry(1, 1, 1); // Create a small cube
-const debugMaterial = new THREE.MeshBasicMaterial({ color: 'aquamarine' }); // Initial color
-const debugObject = new THREE.Mesh(debugGeometry, debugMaterial);
-
-// Position it in front of the camera or any specific place
-debugObject.position.set(0, 1.5, -2); // Adjust position as needed
-
-// Add the debug object to your scene
-scene.add(debugObject);
-
 // Event listeners for entering and exiting VR
 renderer.xr.addEventListener('sessionstart', () => {
     currentSession = renderer.xr.getSession();
@@ -140,86 +128,16 @@ renderer.xr.addEventListener('sessionend', () => {
     controls.update();
 });
 
-// Create a mesh to display the text
-const textMaterial = new THREE.MeshBasicMaterial({ 
-    map: createTextTexture('Controller Status: Disconnected'), // Initial text
-    transparent: true, 
-    side: THREE.DoubleSide 
-});
-const textGeometry = new THREE.PlaneGeometry(2, 0.5); // Adjust size as needed
-const textMesh = new THREE.Mesh(textGeometry, textMaterial);
-textMesh.position.set(0, -2, -3); // Position in front of the camera
-scene.add(textMesh);
-
-function createTextTexture(text, color = 'black') {
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-    canvas.width = 800; // Adjust as needed
-    canvas.height = 200; // Adjust as needed
-
-    // Set canvas background color
-    context.fillStyle = 'white';
-    context.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Set text properties
-    context.font = '36px Arial';
-    context.fillStyle = color;
-    context.textAlign = 'center';
-    context.textBaseline = 'middle';
-    context.fillText(text, canvas.width / 2, canvas.height / 2);
-
-    // Create texture from canvas
-    const texture = new THREE.Texture(canvas);
-    texture.needsUpdate = true;
-    return texture;
-}
-
 // Initialize OrbitControls
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.maxPolarAngle = Math.PI / 2;
 controls.minPolarAngle = Math.PI / 2;
-
-// Controller model factory
-const controllerModelFactory = new XRControllerModelFactory();
 
 // Renderer and scene must already be set up
 const controller1 = renderer.xr.getController(0);
 scene.add(controller1);
 const controller2 = renderer.xr.getController(1);
 scene.add(controller2);
-
-// Create and add the controller models to the scene
-const controllerGrip1 = renderer.xr.getControllerGrip(0);
-controllerGrip1.add(controllerModelFactory.createControllerModel(controllerGrip1));
-scene.add(controllerGrip1);
-
-const controllerGrip2 = renderer.xr.getControllerGrip(1);
-controllerGrip2.add(controllerModelFactory.createControllerModel(controllerGrip2));
-scene.add(controllerGrip2);
-
-// Controller1
-controller1.addEventListener('connected', (event) => {
-    textMaterial.map = createTextTexture(`Controller 1 connected with hand ${event.data.handedness}`);
-    textMaterial.map.needsUpdate = true;
-    handleControllerInput(controller1);
-});
-
-controller1.addEventListener('disconnected', () => {
-    textMaterial.map = createTextTexture('Controller 1 disconnected');
-    textMaterial.map.needsUpdate = true;
-});
-
-// Repeat for Controller2
-controller2.addEventListener('connected', (event) => {
-    textMaterial.map = createTextTexture(`Controller 2 connected with hand ${event.data.handedness}`);
-    textMaterial.map.needsUpdate = true;
-    handleControllerInput(controller2);
-});
-
-controller2.addEventListener('disconnected', () => {
-    textMaterial.map = createTextTexture('Controller 2 disconnected');
-    textMaterial.map.needsUpdate = true;
-});
 
 function animate() {
     if (customMaterial && customMaterial.uniforms.time) {
