@@ -105,7 +105,7 @@ fetch('./data.json')
 
 // Create a geometry, material, and then mesh for the debug object
 const debugGeometry = new THREE.BoxGeometry(1, 1, 1); // Create a small cube
-const debugMaterial = new THREE.MeshBasicMaterial({ color: 'orange' }); // Initial color
+const debugMaterial = new THREE.MeshBasicMaterial({ color: 'yellow' }); // Initial color
 const debugObject = new THREE.Mesh(debugGeometry, debugMaterial);
 
 // Position it in front of the camera or any specific place
@@ -220,10 +220,6 @@ controller2.addEventListener('disconnected', () => {
     textMaterial.map.needsUpdate = true;
 });
 
-let cameraParent = new THREE.Object3D(); // Assuming this exists in your setup
-scene.add(cameraParent);
-cameraParent.add(camera);
-
 function animate() {
     if (customMaterial && customMaterial.uniforms.time) {
         customMaterial.uniforms.time.value += 0.05;
@@ -237,11 +233,12 @@ function animate() {
                 const axes = inputSource.gamepad.axes;
                 if (axes.length >= 2) {
                     const horizontal = axes[0]; // Assuming axes[0] is the horizontal axis
-                    // Adjust camera rotation based on joystick input
-                    // The multiplier controls the sensitivity and direction of rotation
-                    cameraParent.rotation.y += horizontal * 0.05; // Rotate the parent object
 
-                    joystickExists = true; // Joystick exists if there are axes
+                    cylinder.rotation.y += horizontal * 0.05;
+
+                    if (horizontal) {
+                        joystickExists = true; // Joystick exists if there are axes
+                    }
                 }
             }
         });
@@ -249,9 +246,9 @@ function animate() {
 
     // Change the cube's color based on the joystick's existence
     if (joystickExists) {
-        debugObject.material.color.set('pink'); // Joystick exists
+        debugObject.material.color.set('purple'); // Joystick exists
     } else {
-        debugObject.material.color.set('green'); // Joystick does not exist
+        debugObject.material.color.set('red'); // Joystick does not exist
     }
 
     renderer.render(scene, camera);
