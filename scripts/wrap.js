@@ -222,26 +222,24 @@ controller2.addEventListener('disconnected', () => {
 
 function animate() {
     if (customMaterial && customMaterial.uniforms.time) {
-        customMaterial.uniforms.time.value += 0.05;
+        customMaterial.uniforms.time.value += 0.05; // Increment time for any custom animations
     }
     
-    let joystickMoved = false;
+    let joystickExists = false; // Flag to check joystick existence
 
     if (currentSession) {
         currentSession.inputSources.forEach((inputSource) => {
-            if (inputSource && inputSource.gamepad) {
-
-                const axes = inputSource.gamepad.axes;
-                
-                if (axes) {
-                    if (axes[0]) {
-                        debugObject.material.color.set('blue'); // Movement detected
-                    } else {
-                        debugObject.material.color.set('white'); // Movement detected                        
-                    }
-                }
+            if (inputSource && inputSource.gamepad && inputSource.gamepad.axes.length > 0) {
+                joystickExists = true; // Joystick exists if there are axes
             }
         });
+    }
+
+    // Change the cube's color based on the joystick's existence
+    if (joystickExists) {
+        debugObject.material.color.set('blue'); // Joystick exists
+    } else {
+        debugObject.material.color.set('white'); // Joystick does not exist
     }
 
     renderer.render(scene, camera);
