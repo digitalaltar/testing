@@ -230,12 +230,13 @@ function animate() {
         currentSession.inputSources.forEach((inputSource) => {
             if (inputSource && inputSource.gamepad && inputSource.gamepad.axes.length > 0) {
                 const axes = inputSource.gamepad.axes;
-                if (axes.length >= 2) {
+                if (axes.length >= 4) {
                     const horizontal = axes[2];
+                    const vertical = axes[3];
 
                     if (cylinder) {
-                        cylinder.rotation.y += horizontal * 0.05;
-                        debugObject.material.color.set('yellow'); // Joystick exists
+                        cylinder.rotation.y += horizontal * 0.02;
+                        cylinder.position.z += vertical * 0.05;
                     }
                 }
             }
