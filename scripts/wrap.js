@@ -196,6 +196,7 @@ const controllerGrip2 = renderer.xr.getControllerGrip(1);
 controllerGrip2.add(controllerModelFactory.createControllerModel(controllerGrip2));
 scene.add(controllerGrip2);
 
+// Controller1
 controller1.addEventListener('connected', (event) => {
     textMaterial.map = createTextTexture(`Controller 1 connected with hand ${event.data.handedness}`);
     textMaterial.map.needsUpdate = true;
@@ -207,7 +208,7 @@ controller1.addEventListener('disconnected', () => {
     textMaterial.map.needsUpdate = true;
 });
 
-// Repeat for controller2
+// Repeat for Controller2
 controller2.addEventListener('connected', (event) => {
     textMaterial.map = createTextTexture(`Controller 2 connected with hand ${event.data.handedness}`);
     textMaterial.map.needsUpdate = true;
@@ -219,8 +220,6 @@ controller2.addEventListener('disconnected', () => {
     textMaterial.map.needsUpdate = true;
 });
 
-let resetColorTimeout;
-
 function animate() {
     if (customMaterial && customMaterial.uniforms.time) {
         customMaterial.uniforms.time.value += 0.05;
@@ -231,19 +230,16 @@ function animate() {
     if (currentSession) {
         currentSession.inputSources.forEach((inputSource) => {
             if (inputSource && inputSource.gamepad) {
+
                 const axes = inputSource.gamepad.axes;
                 
-                // Simplify the condition to see if any movement is detected
-                if (Math.abs(axes[0]) > 0.1 || Math.abs(axes[1]) > 0.1) {
+                if (axes) {
                     debugObject.material.color.set('red'); // Movement detected
-                    joystickMoved = true;
+                } else {
+                    debugObject.material.color.set('yellow'); // Movement detected
                 }
             }
         });
-    }
-
-    if (!joystickMoved) {
-        debugObject.material.color.set('yellow'); // No movement detected
     }
 
     renderer.render(scene, camera);
