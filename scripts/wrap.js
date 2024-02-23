@@ -105,7 +105,7 @@ fetch('./data.json')
 
 // Create a geometry, material, and then mesh for the debug object
 const debugGeometry = new THREE.BoxGeometry(1, 1, 1); // Create a small cube
-const debugMaterial = new THREE.MeshBasicMaterial({ color: 'pink' }); // Initial color
+const debugMaterial = new THREE.MeshBasicMaterial({ color: 'orange' }); // Initial color
 const debugObject = new THREE.Mesh(debugGeometry, debugMaterial);
 
 // Position it in front of the camera or any specific place
@@ -234,9 +234,11 @@ function animate() {
                 const axes = inputSource.gamepad.axes;
                 
                 if (axes) {
-                    debugObject.material.color.set('red'); // Movement detected
-                } else {
-                    debugObject.material.color.set('yellow'); // Movement detected
+                    if (axes[0]) {
+                        debugObject.material.color.set('blue'); // Movement detected
+                    } else {
+                        debugObject.material.color.set('white'); // Movement detected                        
+                    }
                 }
             }
         });
